@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-07-24T23:49:35.441666",
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "customer_id": 9001,
+      "pattern_type": "structuring",
+      "expected_detection": "rule_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "12 transactions between $8,800-$9,950 within 18-hour window, customer 9001",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9002,
+      "pattern_type": "structuring",
+      "expected_detection": "rule_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "12 transactions between $8,800-$9,950 within 18-hour window, customer 9002",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9003,
+      "pattern_type": "structuring",
+      "expected_detection": "rule_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "12 transactions between $8,800-$9,950 within 18-hour window, customer 9003",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9004,
+      "pattern_type": "structuring",
+      "expected_detection": "rule_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "12 transactions between $8,800-$9,950 within 18-hour window, customer 9004",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9005,
+      "pattern_type": "structuring",
+      "expected_detection": "rule_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "12 transactions between $8,800-$9,950 within 18-hour window, customer 9005",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9006,
+      "pattern_type": "layering",
+      "expected_detection": "graph_engine",
+      "expected_statute": "31 CFR 1010.311 (layering indicator, FATF)",
+      "description": "Customer 9006 acts as intermediate node splitting inbound transfer across 6-8 accounts within tight time window",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9007,
+      "pattern_type": "layering",
+      "expected_detection": "graph_engine",
+      "expected_statute": "31 CFR 1010.311 (layering indicator, FATF)",
+      "description": "Customer 9007 acts as intermediate node splitting inbound transfer across 6-8 accounts within tight time window",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9008,
+      "pattern_type": "layering",
+      "expected_detection": "graph_engine",
+      "expected_statute": "31 CFR 1010.311 (layering indicator, FATF)",
+      "description": "Customer 9008 acts as intermediate node splitting inbound transfer across 6-8 accounts within tight time window",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9009,
+      "pattern_type": "layering",
+      "expected_detection": "graph_engine",
+      "expected_statute": "31 CFR 1010.311 (layering indicator, FATF)",
+      "description": "Customer 9009 acts as intermediate node splitting inbound transfer across 6-8 accounts within tight time window",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9010,
+      "pattern_type": "layering",
+      "expected_detection": "graph_engine",
+      "expected_statute": "31 CFR 1010.311 (layering indicator, FATF)",
+      "description": "Customer 9010 acts as intermediate node splitting inbound transfer across 6-8 accounts within tight time window",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9011,
+      "pattern_type": "mixed_structuring_layering",
+      "expected_detection": "rule_engine+graph_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "Customer 9011 exhibits both structuring and layering behavior",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9012,
+      "pattern_type": "mixed_structuring_layering",
+      "expected_detection": "rule_engine+graph_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "Customer 9012 exhibits both structuring and layering behavior",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9013,
+      "pattern_type": "mixed_structuring_layering",
+      "expected_detection": "rule_engine+graph_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "Customer 9013 exhibits both structuring and layering behavior",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9014,
+      "pattern_type": "mixed_structuring_layering",
+      "expected_detection": "rule_engine+graph_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "Customer 9014 exhibits both structuring and layering behavior",
+      "expected_risk_tier": "HIGH"
+    },
+    {
+      "customer_id": 9015,
+      "pattern_type": "mixed_structuring_layering",
+      "expected_detection": "rule_engine+graph_engine",
+      "expected_statute": "31 CFR 1010.311",
+      "description": "Customer 9015 exhibits both structuring and layering behavior",
+      "expected_risk_tier": "HIGH"
+    }
+  ]
+}
