@@ -55,7 +55,9 @@ class QueryIntent(BaseModel):
 class ToolName(str, Enum):
     EDA = "eda"
     FEATURE_ENG = "feature_eng"
-    DETECTION = "detection"
+    RULES = "rules"
+    ML = "ml"
+    GRAPH = "graph"
     RISK = "risk"
     EXPLAIN = "explain"
 
