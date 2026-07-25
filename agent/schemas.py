@@ -93,6 +93,9 @@ class EvidenceItem(BaseModel):
     detection_source: Literal["rule_engine", "ml_engine", "graph_engine", "hybrid"]
     explanation: str
     supporting_metrics: dict = Field(default_factory=dict)
+    ml_deviation_drivers: list[dict] = Field(default_factory=list, description="Top z-score deviation features from ML layer, if it ran")
+    ml_anomaly_score: Optional[float] = None
+    hop_trace: list[str] = Field(default_factory=list, description="Multi-hop layering trace, if graph engine ran")
     recommended_action: str
 
 

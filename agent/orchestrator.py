@@ -223,6 +223,9 @@ class ApexOrchestrator:
                         supporting_metrics={
                             "rolling_24h_sub_threshold_count": rule_result.get("trigger_detail", ""),
                         },
+                        ml_deviation_drivers=ml_result.get("deviation_drivers", []) if ml_result.get("is_anomaly") else [],
+                        ml_anomaly_score=ml_result.get("anomaly_score"),
+                        hop_trace=layering_result.get("hop_trace", []),
                         recommended_action=risk_result["recommended_action"],
                     ))
 
