@@ -145,3 +145,115 @@ def get_customer_summary(df: pd.DataFrame, customer_id: int) -> dict:
         ),
         "has_sufficient_history": bool(cust_df["has_sufficient_history"].iloc[0]),
     }
+
+# ---------- Graph / Multi-hop Layering Detection ----------
+
+import networkx as nx
+
+
+def build_transaction_graph(df: pd.DataFrame) -> nx.DiGraph:
+    """
+    Build a directed multigraph of money flow: customer_id -> counterparty_id,
+    weighted by amount and annotated with timestamp for time-window analysis.
+    """
+    G = nx.MultiDiGraph()
+    for _, row in df.iterrows():
+        G.add_edge(
+            row["customer_id"],
+            row["counterparty_id"],
+            amount=row["amount"],
+            timestamp=row["timestamp"],
+            transaction_id=row["transaction_id"],
+        )
+    return G
+
+
+def get_ego_subgraph(G: nx.MultiDiGraph, entity_id: int, k_hops: int = 2) -> nx.MultiDiGraph:
+    """
+    Bounded k-hop subgraph around a single entity -- NOT the full graph.
+    This is the latency fix: entity-lookup queries must not pay the cost
+    of global centrality computation across the entire transaction network.
+    """
+    if entity_id not in G:
+        return nx.MultiDiGraph()
+
+    # Treat as undirected for neighbor traversal (money flows both ways matter for layering)
+    undirected = G.to_undirected()
+    nodes_in_range = {entity_id}
+    frontier = {entity_id}
+
+    for _ in range(k_hops):
+        next_frontier = set()
+        for node in frontier:
+            next_frontier.update(undirected.neighbors(node))
+        nodes_in_range.update(next_frontier)
+        frontier = next_frontier
+
+    return G.subgraph(nodes_in_range).copy()
+
+
+def detect_layering_pattern(
+    G: nx.MultiDiGraph, entity_id: int, k_hops: int = 2,
+    min_out_degree: int = 4, window_minutes: int = 60
+) -> dict:
+    """
+    Checks if entity_id acts as a layering intermediate: receives a large inbound
+    transfer, then rapidly (within window_minutes) splits it across >= min_out_degree
+    distinct outbound accounts. Runs only on the bounded ego subgraph.
+    """
+    subgraph = get_ego_subgraph(G, entity_id, k_hops)
+
+    if entity_id not in subgraph:
+        return {
+            "entity_id": entity_id,
+            "is_layering_intermediate": False,
+            "reason": "entity not found in transaction graph",
+            "hop_trace": [],
+        }
+
+    # Inbound edges to entity_id
+    inbound = []
+    for u, v, data in subgraph.in_edges(entity_id, data=True):
+        inbound.append({"from": u, "amount": data["amount"], "timestamp": data["timestamp"]})
+
+    # Outbound edges from entity_id
+    outbound = []
+    for u, v, data in subgraph.out_edges(entity_id, data=True):
+        outbound.append({"to": v, "amount": data["amount"], "timestamp": data["timestamp"]})
+
+    if not inbound or len(outbound) < min_out_degree:
+        return {
+            "entity_id": entity_id,
+            "is_layering_intermediate": False,
+            "reason": f"insufficient fan-out (found {len(outbound)}, need >= {min_out_degree})",
+            "hop_trace": [],
+        }
+
+    # Check if outbound transactions cluster within window_minutes of an inbound one
+    inbound_sorted = sorted(inbound, key=lambda x: pd.Timestamp(x["timestamp"]))
+    biggest_inbound = max(inbound_sorted, key=lambda x: x["amount"])
+    inbound_time = pd.Timestamp(biggest_inbound["timestamp"])
+    window = pd.Timedelta(minutes=window_minutes)
+
+    clustered_outbound = [
+        o for o in outbound
+        if abs((pd.Timestamp(o["timestamp"]) - inbound_time).total_seconds() / 60) <= window_minutes
+    ]
+
+    is_layering = len(clustered_outbound) >= min_out_degree
+
+    hop_trace = [f"[HOP 1] {biggest_inbound['from']} -> {entity_id} (${biggest_inbound['amount']:,.2f})"]
+    for o in clustered_outbound:
+        hop_trace.append(f"[HOP 2] {entity_id} -> {o['to']} (${o['amount']:,.2f})")
+
+    return {
+        "entity_id": entity_id,
+        "is_layering_intermediate": is_layering,
+        "reason": (
+            f"{len(clustered_outbound)} outbound transfers within {window_minutes}min "
+            f"of largest inbound (${biggest_inbound['amount']:,.2f})"
+        ),
+        "hop_trace": hop_trace,
+        "num_clustered_outbound": len(clustered_outbound),
+        "total_outbound_amount": sum(o["amount"] for o in clustered_outbound),
+    }
