@@ -2,6 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-zinc-950 text-zinc-100;
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@500;600;700;800&display=swap');
+
+:root {
+  --bg-void: #08080a;
+  --bg-panel: #0e0e11;
+  --bg-raised: #131316;
+  --line: #1f1f24;
+  --line-bright: #2a2a31;
+  --text-primary: #e4e4e7;
+  --text-secondary: #8b8b96;
+  --text-dim: #55555f;
+  --accent-live: #34d399;
+  --accent-live-dim: #0a2f22;
+  --accent-risk: #fb7185;
+  --accent-risk-dim: #2f0f16;
+  --accent-warn: #fbbf24;
+  --accent-warn-dim: #2f2408;
 }
+
+* {
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(52, 211, 153, 0.03), transparent),
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+
+.font-display {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font-data {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes node-arrive {
+  0% { opacity: 0; transform: translateY(3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pulse-live { animation: pulse-live 1.6s ease-in-out infinite; }
+.animate-node-arrive { animation: node-arrive 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-bright); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a42; }

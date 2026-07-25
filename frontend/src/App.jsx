@@ -36,41 +36,90 @@ function App() {
   const totalTools = trace?.tool_trace?.length ?? 7;
 
   return (
-    <div className="h-screen overflow-hidden bg-zinc-950 text-zinc-100 font-mono flex flex-col">
+    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'var(--bg-void)' }}>
+
       {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-3 flex items-center justify-between bg-zinc-900/40">
-        <div className="font-bold tracking-wider text-sm">
-          APEX <span className="text-zinc-500">//</span> AML COMPLIANCE TERMINAL
+      <header
+        className="px-6 py-3.5 flex items-center justify-between shrink-0"
+        style={{ borderBottom: '1px solid var(--line)', background: 'var(--bg-panel)' }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="relative w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent-live)' }}>
+            <div className="absolute inset-0 rounded-full animate-pulse-live" style={{ background: 'var(--accent-live)' }} />
+          </div>
+          <div className="font-display font-bold text-[13px] tracking-wide" style={{ color: 'var(--text-primary)' }}>
+            APEX <span style={{ color: 'var(--text-dim)' }}>//</span> AML COMPLIANCE TERMINAL
+          </div>
         </div>
-        <div className="flex items-center gap-4 text-xs">
-          <span className="px-2 py-1 rounded border border-zinc-800 text-zinc-400">
-            [PARSER: {parserLabel}]
-          </span>
-          <span className="px-2 py-1 rounded border border-zinc-800 text-zinc-400">
-            ⚡ {trace ? `${trace.total_duration_ms}ms` : '—'}
-          </span>
-          <span className="px-2 py-1 rounded border border-zinc-800 text-zinc-400">
-            [TOOLS EXECUTED: {executedCount}/{totalTools}]
-          </span>
+
+        <div className="flex items-center gap-2 font-data text-[10.5px]">
+          <div
+            className="px-2.5 py-1 rounded-sm flex items-center gap-1.5"
+            style={{ border: '1px solid var(--line)', color: 'var(--text-secondary)' }}
+          >
+            <span style={{ color: 'var(--text-dim)' }}>PARSER</span>
+            <span style={{ color: 'var(--text-primary)' }}>{parserLabel}</span>
+          </div>
+          <div
+            className="px-2.5 py-1 rounded-sm flex items-center gap-1.5 tabular-nums"
+            style={{ border: '1px solid var(--line)', color: 'var(--text-secondary)' }}
+          >
+            <span style={{ color: 'var(--accent-live)' }}>⚡</span>
+            <span style={{ color: trace ? 'var(--text-primary)' : 'var(--text-dim)' }}>
+              {trace ? `${trace.total_duration_ms}ms` : '— ms'}
+            </span>
+          </div>
+          <div
+            className="px-2.5 py-1 rounded-sm flex items-center gap-1.5"
+            style={{ border: '1px solid var(--line)', color: 'var(--text-secondary)' }}
+          >
+            <span style={{ color: 'var(--text-dim)' }}>TOOLS</span>
+            <span style={{ color: 'var(--text-primary)' }}>{executedCount}/{totalTools}</span>
+          </div>
         </div>
       </header>
 
       {/* Main 2-column layout */}
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-2/5 border-r border-zinc-800 overflow-y-auto">
+        <div
+          className="w-[380px] shrink-0 overflow-y-auto"
+          style={{ borderRight: '1px solid var(--line)', background: 'var(--bg-panel)' }}
+        >
           <TerminalPanel onRunQuery={runQuery} loading={loading} error={error} />
         </div>
-        <div className="w-3/5 overflow-y-auto p-6 space-y-6">
+
+        <div className="flex-1 overflow-y-auto px-8 py-7">
           <DAGViewer toolTrace={trace?.tool_trace} />
+
           {trace && (
-            <div className="space-y-3">
-              <div className="text-xs text-zinc-500">{trace.summary}</div>
+            <div className="mt-8 space-y-3">
+              <div className="font-data text-[11px]" style={{ color: 'var(--text-dim)' }}>
+                {trace.summary}
+              </div>
+
               {trace.evidence.length === 0 && (
-                <div className="text-sm text-zinc-600 italic">No entities flagged for this query.</div>
+                <div
+                  className="font-data text-[12px] py-8 text-center rounded"
+                  style={{ color: 'var(--text-dim)', border: '1px dashed var(--line)' }}
+                >
+                  no entities flagged for this query
+                </div>
               )}
-              {trace.evidence.map((item) => (
-                <EvidenceCard key={item.customer_id} item={item} />
+
+              {trace.evidence.map((item, i) => (
+                <EvidenceCard key={item.customer_id} item={item} index={i} />
               ))}
+            </div>
+          )}
+
+          {!trace && !loading && (
+            <div className="mt-16 text-center">
+              <div className="font-data text-[11px]" style={{ color: 'var(--text-dim)' }}>
+                awaiting investigation query —
+              </div>
+              <div className="font-data text-[11px] mt-1" style={{ color: 'var(--text-dim)' }}>
+                select a preset or type a custom query to begin
+              </div>
             </div>
           )}
         </div>
