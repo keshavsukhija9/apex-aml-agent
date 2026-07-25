@@ -50,6 +50,17 @@ Each query produces a distinct execution path. This is the core requirement of t
 
 Measured response times (warm cache, after first request): 250-280ms for rule/graph-based queries, under 2ms for pure EDA profiling. First request in a process incurs a one-time cost (~800-1200ms) for feature computation and IsolationForest fit, which is then cached for the process lifetime.
 
+## Validation
+
+False-positive check against the normal population (500 customers, excluding the 15 planted scenarios), run against both detection mechanisms independently:
+
+| Rule | Flagged (of 500 normal customers) | False Positive Rate |
+|---|---|---|
+| Structuring (sub-$10k rolling window) | 0 | 0.00% |
+| Layering (graph traversal) | 0 | 0.00% |
+
+This confirms rule thresholds produce zero false alerts on this synthetic benchmark's baseline population. This is not a claim of real-world precision -- synthetic "normal" behavior is generated from a clean lognormal distribution and is not adversarial toward these thresholds. A production deployment would require threshold calibration against real transaction data before this number could be trusted at face value.
+
 ## Setup
 
 ```bash
