@@ -54,13 +54,20 @@ class ApexOrchestrator:
     def _get_target_customer_ids(self, intent) -> list[int]:
         """
         Determine which customers this query applies to.
-        Entity lookup -> single customer. Otherwise -> scan candidates
-        (for the hackathon scope, this is the full customer population;
-        a production system would push filters into the query itself).
+        Entity lookup -> single customer. Otherwise -> scan candidates,
+        narrowed by date_range_days if the query specified one -- this is
+        what makes "last 30 days" actually restrict the evaluated population
+        rather than just being displayed and ignored.
         """
         if intent.filters.customer_id is not None:
             return [intent.filters.customer_id]
-        return self.df_raw["customer_id"].unique().tolist()
+
+        df = self.df_raw
+        if intent.filters.date_range_days is not None:
+            cutoff = df["timestamp"].max() - pd.Timedelta(days=intent.filters.date_range_days)
+            df = df[df["timestamp"] >= cutoff]
+
+        return df["customer_id"].unique().tolist()
 
     def run_query(self, query: str) -> AgentTrace:
         start_total = time.perf_counter()
