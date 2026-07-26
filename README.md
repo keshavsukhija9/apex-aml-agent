@@ -61,6 +61,20 @@ False-positive check against the normal population (500 customers, excluding the
 
 This confirms rule thresholds produce zero false alerts on this synthetic benchmark's baseline population. This is not a claim of real-world precision -- synthetic "normal" behavior is generated from a clean lognormal distribution and is not adversarial toward these thresholds. A production deployment would require threshold calibration against real transaction data before this number could be trusted at face value.
 
+## Boundary Validation
+
+The baseline false-positive test above uses a normal population whose transactions are scattered randomly across the observation window, so it structurally cannot produce 5+ same-day transactions regardless of amount. To test a harder case, we generated 25 synthetic customers deliberately shaped to resemble structuring at the boundary:
+
+- 15 customers with 3-4 same-day near-$10,000 cash deposits (below the 5-transaction count threshold, several exceeding $30,000 in same-day total) -- should NOT trigger
+- 10 customers with 5-6 same-day near-$10,000 cash deposits (at/above the count threshold) -- should trigger
+
+| Tier | Flagged | Rate |
+|---|---|---|
+| Below-threshold (n=15) | 0 | 0.0% false positive |
+| At-threshold (n=10) | 10 | 100.0% true positive |
+
+This confirms the rule's boundary is genuinely count-gated, not just permissive by amount -- several below-threshold customers had same-day totals exceeding $30,000 and were still correctly not flagged, because the count condition (>= 5 transactions) was not met. Script: `near_miss_test.py`.
+
 ## Setup
 
 ```bash
