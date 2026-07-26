@@ -6,6 +6,8 @@ Query-driven Anti-Money Laundering (AML) compliance engine using dynamic tool or
 
 Traditional AML systems evaluate every query through a rigid pipeline (`EDA -> Preprocessing -> Full Model Inference -> Narrative`). This adds unnecessary latency on simple lookups and inflates false-positive volume, since every query pays the cost of every stage regardless of what it actually asks for.
 
+ML is treated as a fallback signal, not a headline feature. In an AML compliance context, an unexplainable model producing false confidence is a worse outcome than no model at all -- rules are the primary, statute-cited, auditable detection layer, and IsolationForest only runs when a query's intent explicitly calls for statistical anomaly detection.
+
 Apex-AML parses natural language queries into structured parameters (`customer_id`, `date_range_days`, `pattern_type`, `min_transaction_count`, `max_amount`) and compiles a dynamic execution DAG. Tools irrelevant to the query's intent are skipped at runtime, not just at planning time — the skip decision is logged and returned in the response trace so it can be audited after the fact.
 
 ## Core Architecture
