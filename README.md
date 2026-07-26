@@ -2,6 +2,10 @@
 
 Query-driven Anti-Money Laundering (AML) compliance engine using dynamic tool orchestration and deterministic routing. Bypasses fixed sequential pipelines to execute only query-relevant detection modules.
 
+## Problem Statement
+
+Financial institutions are required to run Anti-Money Laundering (AML) compliance programs, but legacy rule-based systems generate high false-positive volume and overwhelm compliance teams. The core technical requirement: build an agent that parses a natural language investigative query, extracts intent and filters, and dynamically constructs an execution plan -- invoking only the detection tools relevant to that specific query, rather than running every query through the same fixed pipeline. The expected output for each query is a query-aware execution summary, risk-tiered flags, and a human-readable, statute-grounded explanation for each flag.
+
 ## Overview
 
 Traditional AML systems evaluate every query through a rigid pipeline (`EDA -> Preprocessing -> Full Model Inference -> Narrative`). This adds unnecessary latency on simple lookups and inflates false-positive volume, since every query pays the cost of every stage regardless of what it actually asks for.
