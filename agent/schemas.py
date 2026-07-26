@@ -107,3 +107,4 @@ class AgentTrace(BaseModel):
     total_duration_ms: float
     evidence: list[EvidenceItem]
     summary: str
+    low_confidence: bool = False

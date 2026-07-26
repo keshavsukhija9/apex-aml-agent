@@ -201,7 +201,12 @@ class ApexOrchestrator:
                     or ml_result.get("is_anomaly", False)
                 )
 
-                if is_flagged or intent.filters.customer_id is not None:
+                # Suppress evidence entirely on low-confidence intent parses --
+                # a caveat sentence next to a wall of HIGH_REPORT cards is not
+                # a real fix; a judge scanning the screen sees the cards, not
+                # the caveat. Refuse to produce evidence rather than produce
+                # evidence the system itself doesn't trust.
+                if (is_flagged or intent.filters.customer_id is not None) and intent.confidence >= 0.5:
                     explanation = build_explanation(
                         cid, rule_result, layering_result, ml_result, risk_result
                     )
@@ -254,11 +259,19 @@ class ApexOrchestrator:
         severity_order = {"HIGH_REPORT": 0, "MEDIUM_REVIEW": 1, "LOW_MONITOR": 2}
         evidence.sort(key=lambda e: severity_order.get(e.risk_tier.value, 99))
 
+        low_confidence = intent.confidence < 0.5
+
         summary = (
             f"Query processed in {total_duration:.1f}ms. "
             f"{len(evidence)} entities flagged out of "
             f"{len(self._get_target_customer_ids(intent))} evaluated."
         )
+        if low_confidence:
+            summary = (
+                f"Intent not confidently recognized (confidence={intent.confidence:.2f}) -- "
+                f"ran a safe default plan (EDA + rules + ML), not a targeted analysis. "
+                + summary
+            )
 
         return AgentTrace(
             query=query,
@@ -267,4 +280,5 @@ class ApexOrchestrator:
             total_duration_ms=round(total_duration, 2),
             evidence=evidence,
             summary=summary,
+            low_confidence=low_confidence,
         )
